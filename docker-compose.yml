@@ -1,0 +1,46 @@
+version: '3.9'
+
+networks:
+  tracing:
+    name: tracing-network
+
+services:
+  jaeger:
+    image: jaegertracing/all-in-one:1.41
+    container_name: jaeger01
+    environment:
+      - COLLECTOR_ZIPKIN_HOST_PORT=:9411
+      - COLLECTOR_OTLP_ENABLED=true
+    ports:
+      - 6831:6831/udp
+      - 6832:6832/udp
+      - 5778:5778
+      - 16686:16686
+      - 4317:4317
+      - 4318:4318
+      - 14250:14250
+      - 14268:14268
+      - 14269:14269
+      - 9411:9411
+    networks:
+      - tracing
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq01
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - 15672:15672
+      - 5672:5672
+    networks:
+      - tracing
+  
+  redis:
+    image: redis:6.2.1
+    container_name: redis01
+    ports:
+    - 6380:6379
+    networks:
+      - tracing
